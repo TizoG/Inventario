@@ -17,6 +17,5 @@ def home()-> rx.Component:
             padding_x="4rem",
             margin_top="2rem",
             
-            
         ),
     )

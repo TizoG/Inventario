@@ -261,7 +261,7 @@ def inventario() -> rx.Component:
             rx.text("MODAL ABIERTO", color="green", font_weight="bold"),
             rx.text("MODAL CERRADO", color="gray"),
         ),
-        # modal overlay
+        # Overlay para agregar producto (compatible, centrado y proporcional)
         rx.cond(
             InventarioState.show_add_modal,
             rx.box(
@@ -276,28 +276,29 @@ def inventario() -> rx.Component:
                         formulario_producto(),
                     ),
                     padding="1rem",
-                    width='720px',
+                    width='clamp(320px,90%,720px)',
                     border_radius='8px',
-                    bg='white'
+                    bg='white',
+                    role='dialog',
+                    aria_label='Agregar producto',
                 ),
                 position="fixed",
-                top="0",
-                left="0",
-                width="100%",
-                height="100%",
+                inset="0",
+                display='flex',
                 align_items="center",
                 justify_content="center",
                 bg="rgba(0,0,0,0.4)",
-                padding_top="4rem",
+                padding="1.5rem",
+                z_index=50,
             ),
         ),
+        # Overlay para editar producto (compatible, centrado y proporcional)
         rx.cond(
             InventarioState.show_edit_modal,
             rx.box(
                 rx.box(
-                    # editar formulario en modal
                     rx.vstack(
-                        rx.box(rx.text('Editar Producto', color='white', font_weight='bold'), padding='0.75rem', bg='#457B9D', width='100%', border_radius='6px 6px 0 0'),
+                        rx.hstack(rx.text('Editar Producto', font_weight='bold'), rx.button('Cancelar', on_click=InventarioState.close_edit_modal, variant='ghost'), width='100%', justify='between'),
                         rx.vstack(
                             rx.input(placeholder='Nombre del producto', value=InventarioState.form_nombre, on_change=InventarioState.set_form_nombre, width='100%'),
                             rx.cond(InventarioState.form_errors.get('nombre'), rx.text(InventarioState.form_errors.get('nombre'), color='red', font_size='sm')),
@@ -312,11 +313,20 @@ def inventario() -> rx.Component:
                         ),
                     ),
                     padding='1rem',
-                    width='720px',
+                    width='clamp(320px,90%,720px)',
                     border_radius='8px',
-                    bg='white'
+                    bg='white',
+                    role='dialog',
+                    aria_label='Editar producto',
                 ),
-                position='fixed', top='0', left='0', width='100%', height='100%', align_items='center', justify_content='center', bg='rgba(0,0,0,0.4)', padding_top='4rem'
+                position='fixed',
+                inset='0',
+                display='flex',
+                align_items='center',
+                justify_content='center',
+                bg='rgba(0,0,0,0.4)',
+                padding='1.5rem',
+                z_index=50,
             ),
         ),
         estadisticas(),
