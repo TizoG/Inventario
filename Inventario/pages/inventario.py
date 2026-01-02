@@ -123,15 +123,6 @@ def formulario_producto() -> rx.Component:
 
 def tabla_productos() -> rx.Component:
     """Lista de productos estilizada"""
-    def category_gradient(cat: str):
-        mapping = {
-            'material': 'linear-gradient(90deg, #457B9D, #1D3557)',
-            'herramienta': 'linear-gradient(90deg, #22C55E, #15803D)',
-            'quimico': 'linear-gradient(90deg, #EAB308, #A16207)'
-        }
-
-        return mapping.get((cat or '').lower(), 'linear-gradient(90deg, #667eea, #764ba2)')
-
     return rx.box(
         rx.vstack(
             rx.heading("Productos", size="3"),
@@ -144,46 +135,57 @@ def tabla_productos() -> rx.Component:
                 spacing='3',
                 width='100%'
             ),
-            rx.cond(
+                rx.cond(
                 InventarioState.productos_display,
                 rx.grid(
-                    *[rx.box(
-                        # card
-                        rx.vstack(
-                            # header
-                            rx.hstack(
-                                rx.text(p['nombre'], font_weight='bold'),
-                                rx.text(p.get('estado',''), font_weight='bold'),
-                                width='100%',
-                                justify='between'
-                            ),
-                            # body
-                            rx.hstack(
-                                rx.vstack(
-                                    rx.text(f"Unidades: {p.get('cantidad',0)}"),
-                                    rx.text(f"Proveedor: {p.get('proveedor','-')}")
+                    rx.foreach(
+                        InventarioState.productos_display,
+                        lambda producto: rx.box(
+                            rx.vstack(
+                                rx.hstack(
+                                    rx.text(producto['nombre'], font_weight='bold'),
+                                    rx.text(producto.get('estado',''), font_weight='bold'),
+                                    width='100%',
+                                    justify='between'
                                 ),
-                                rx.vstack(
-                                    rx.text(f"Categoría: {p.get('categoria','-')}") ,
-                                    rx.text(f"Creado: {p.get('fecha_creacion','-')}")
+                                rx.hstack(
+                                    rx.vstack(
+                                        rx.text(f"Unidades: {producto.get('cantidad',0)}"),
+                                        rx.text(f"Proveedor: {producto.get('proveedor','-')}")
+                                    ),
+                                    rx.vstack(
+                                        rx.text(f"Categoría: {producto.get('categoria','-')}") ,
+                                        rx.text(f"Creado: {producto.get('fecha_creacion','-')}")
+                                    ),
+                                    spacing='4',
+                                    width='100%'
                                 ),
-                                spacing='4',
-                                width='100%'
-                            ),
-                            # footer actions
-                            rx.hstack(
-                                rx.button('Ver', on_click=lambda producto=p: InventarioState.open_view_modal(producto), color_scheme='blue'),
-                                rx.button('Editar', on_click=lambda producto=p: InventarioState.open_edit_modal(producto), variant='outline', color_scheme='gray'),
-                                rx.icon_button('trash', on_click=lambda producto=p: InventarioState.eliminar_producto(producto['id']), color='red'),
+                                rx.hstack(
+                                    rx.button('Ver', on_click=lambda producto=producto: InventarioState.open_view_modal(producto), color_scheme='blue'),
+                                    rx.button('Editar', on_click=lambda producto=producto: InventarioState.open_edit_modal(producto), variant='outline', color_scheme='gray'),
+                                    rx.icon_button('trash', on_click=lambda producto=producto: InventarioState.eliminar_producto(producto['id']), color='red'),
+                                    spacing='3'
+                                ),
                                 spacing='3'
                             ),
-                            spacing='3'
+                            padding='1rem',
+                            border_radius='8px',
+                            box_shadow='sm',
+                            bg=rx.cond(
+                                producto['categoria'] == 'material',
+                                'linear-gradient(90deg, #457B9D, #1D3557)',
+                                rx.cond(
+                                    producto['categoria'] == 'herramienta',
+                                    'linear-gradient(90deg, #22C55E, #15803D)',
+                                    rx.cond(
+                                        producto['categoria'] == 'quimico',
+                                        'linear-gradient(90deg, #EAB308, #A16207)',
+                                        'linear-gradient(90deg, #667eea, #764ba2)'
+                                    ),
+                                ),
+                            ),
                         ),
-                        padding='1rem',
-                        border_radius='8px',
-                        box_shadow='sm',
-                        bg=category_gradient(p.get('categoria'))
-                    ) for p in InventarioState.productos_display],
+                    ),
                     columns='3',
                     gap='1rem'
                 ),
@@ -249,17 +251,34 @@ def inventario() -> rx.Component:
                 rx.text("Gestiona tu inventario de materiales de forma eficiente", color="gray"),
             ),
             rx.spacer(),
-            rx.button("Agregar material", on_click=InventarioState.open_add_modal, color_scheme="blue"),
+            rx.button("Agregar material", on_click=lambda: InventarioState.set_show_add_modal(True), color_scheme="blue"),
             width="100%",
             align="center",
+        ),
+        # Indicador temporal para depuración: muestra si el modal está abierto
+        rx.cond(
+            InventarioState.show_add_modal,
+            rx.text("MODAL ABIERTO", color="green", font_weight="bold"),
+            rx.text("MODAL CERRADO", color="gray"),
         ),
         # modal overlay
         rx.cond(
             InventarioState.show_add_modal,
             rx.box(
                 rx.box(
-                    formulario_producto(),
+                    rx.vstack(
+                        rx.hstack(
+                            rx.text('Nuevo material', font_weight='bold', font_size='lg'),
+                            rx.button('Cancelar', on_click=InventarioState.close_add_modal, variant='ghost'),
+                            width='100%',
+                            justify='between'
+                        ),
+                        formulario_producto(),
+                    ),
                     padding="1rem",
+                    width='720px',
+                    border_radius='8px',
+                    bg='white'
                 ),
                 position="fixed",
                 top="0",
@@ -301,9 +320,12 @@ def inventario() -> rx.Component:
             ),
         ),
         estadisticas(),
+        # Mostrar tabla principal; el formulario solo aparece en el modal
         rx.hstack(
-            formulario_producto(),
-            tabla_productos(),
+            rx.box(
+                tabla_productos(),
+                width="100%",
+            ),
             spacing="6",
             width="100%",
         ),

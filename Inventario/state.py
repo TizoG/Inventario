@@ -224,6 +224,52 @@ class InventarioState(rx.State):
 
         self.form_errors = errors
         return len(errors) == 0
+
+    # Setters explícitos (evitan la dependencia de state_auto_setters)
+    def set_form_nombre(self, value: str):
+        self.form_nombre = value
+
+    def set_form_descripcion(self, value: str):
+        self.form_descripcion = value
+
+    def set_form_cantidad(self, value: str):
+        self.form_cantidad = value
+
+    def set_form_precio(self, value: str):
+        self.form_precio = value
+
+    def set_form_categoria(self, value: str):
+        self.form_categoria = value
+
+    def set_form_unidad(self, value: str):
+        self.form_unidad = value
+
+    def set_form_proveedor(self, value: str):
+        self.form_proveedor = value
+
+    def set_form_estado(self, value: str):
+        self.form_estado = value
+
+    def set_form_stock_minimo(self, value: str):
+        self.form_stock_minimo = value
+
+    def set_search_query(self, value: str):
+        self.search_query = value
+
+    def set_filter_categoria(self, value: str):
+        self.filter_categoria = value
+
+    def set_filter_estado(self, value: str):
+        self.filter_estado = value
+
+    def set_show_add_modal(self, value: bool):
+        self.show_add_modal = value
+
+    def set_show_edit_modal(self, value: bool):
+        self.show_edit_modal = value
+
+    def set_show_view_modal(self, value: bool):
+        self.show_view_modal = value
     
     def eliminar_producto(self, producto_id: int):
         """Elimina un producto"""
