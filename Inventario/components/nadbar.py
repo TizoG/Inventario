@@ -18,7 +18,7 @@ def nadbar() -> rx.Component:
                 ),
                 icon_button(
                 "box",
-                "/"
+                "/inventario"
                 ),
                 icon_button(
                 "search",
@@ -36,14 +36,15 @@ def nadbar() -> rx.Component:
                 "user",
                 "/"
                 ),
-                spacing="5"
+                spacing="5",
             ),
             
-            justify="between"
+            justify="between",
+            width="100%",
         ),
         padding_x="2rem",
         padding_y="2rem",
         bg="#1D3557",
-        color="white"
-
+        color="white",
+        width="100%",
     )
