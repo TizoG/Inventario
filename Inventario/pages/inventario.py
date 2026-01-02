@@ -18,15 +18,15 @@ def formulario_producto() -> rx.Component:
                 border_radius="6px 6px 0 0",
             ),
             rx.vstack(
-                        rx.input(
-                            placeholder="Nombre del producto",
-                            value=InventarioState.form_nombre,
-                            on_change=InventarioState.set_form_nombre,
-                            width="100%",
-                            bg="#f8fafc",
-                            border_radius="6px",
-                            padding="0.5rem",
-                        ),
+                rx.input(
+                    placeholder="Nombre del producto",
+                    value=InventarioState.form_nombre,
+                    on_change=InventarioState.set_form_nombre,
+                    width="100%",
+                    bg="#f8fafc",
+                    border_radius="6px",
+                    padding="0.5rem",
+                ),
                 rx.input(
                     placeholder="Descripción",
                     value=InventarioState.form_descripcion,
@@ -36,57 +36,61 @@ def formulario_producto() -> rx.Component:
                     border_radius="6px",
                     padding="0.5rem",
                 ),
-                        rx.hstack(
-                            rx.input(
-                                placeholder="Unidad de medida",
-                                value=InventarioState.form_unidad,
-                                on_change=InventarioState.set_form_unidad,
-                                width="50%",
-                            ),
-                            rx.input(
-                                placeholder="Proveedor",
-                                value=InventarioState.form_proveedor,
-                                on_change=InventarioState.set_form_proveedor,
-                                width="50%",
-                            ),
-                            spacing="3",
-                        ),
-                        rx.hstack(
-                            rx.input(
-                                placeholder="Estado (ej. disponible)",
-                                value=InventarioState.form_estado,
-                                on_change=InventarioState.set_form_estado,
-                                width="50%",
-                            ),
-                            rx.input(
-                                placeholder="Stock mínimo",
-                                value=InventarioState.form_stock_minimo,
-                                on_change=InventarioState.set_form_stock_minimo,
-                                type_="number",
-                                width="50%",
-                            ),
-                            spacing="3",
-                        ),
-            rx.input(
-                placeholder="Cantidad",
-                value=InventarioState.form_cantidad,
-                on_change=InventarioState.set_form_cantidad,
-                type_="number",
-                width="100%",
-            ),
-            rx.input(
-                placeholder="Precio unitario",
-                value=InventarioState.form_precio,
-                on_change=InventarioState.set_form_precio,
-                type_="number",
-                width="100%",
-            ),
-            rx.input(
-                placeholder="Categoría",
-                value=InventarioState.form_categoria,
-                on_change=InventarioState.set_form_categoria,
-                width="100%",
-            ),
+                rx.hstack(
+                    rx.input(
+                        placeholder="Unidad de medida",
+                        value=InventarioState.form_unidad,
+                        on_change=InventarioState.set_form_unidad,
+                        width="50%",
+                    ),
+                    rx.input(
+                        placeholder="Proveedor",
+                        value=InventarioState.form_proveedor,
+                        on_change=InventarioState.set_form_proveedor,
+                        width="50%",
+                    ),
+                    spacing="3",
+                ),
+                rx.hstack(
+                    rx.input(
+                        placeholder="Estado (ej. disponible)",
+                        value=InventarioState.form_estado,
+                        on_change=InventarioState.set_form_estado,
+                        width="50%",
+                    ),
+                    rx.input(
+                        placeholder="Stock mínimo",
+                        value=InventarioState.form_stock_minimo,
+                        on_change=InventarioState.set_form_stock_minimo,
+                        type_="number",
+                        width="50%",
+                    ),
+                    spacing="3",
+                ),
+                rx.input(
+                    placeholder="Cantidad",
+                    value=InventarioState.form_cantidad,
+                    on_change=InventarioState.set_form_cantidad,
+                    type_="number",
+                    width="100%",
+                ),
+                rx.input(
+                    placeholder="Precio unitario",
+                    value=InventarioState.form_precio,
+                    on_change=InventarioState.set_form_precio,
+                    type_="number",
+                    width="100%",
+                ),
+                # Usar input en vez de select por compatibilidad con la versión instalada
+                # Select de categoría: pasar items como lista de dicts {label, value}
+                # Cambia el bloque del rx.select por este:
+                    rx.select(
+                        ["Material", "Herramienta", "Químico", "Electrónico", "Otro"],
+                        value=InventarioState.form_categoria,
+                        on_change=InventarioState.set_form_categoria,
+                        placeholder="Selecciona una categoría",
+                        width="100%",
+                    ),
                 rx.hstack(
                     rx.button(
                         "Agregar Producto",
@@ -172,16 +176,21 @@ def tabla_productos() -> rx.Component:
                             border_radius='8px',
                             box_shadow='sm',
                             bg=rx.cond(
-                                producto['categoria'] == 'material',
-                                'linear-gradient(90deg, #457B9D, #1D3557)',
+                                producto['categoria'] == 'Material',
+                                'linear-gradient(90deg, #60A5FA, #3B82F6)',
                                 rx.cond(
-                                    producto['categoria'] == 'herramienta',
-                                    'linear-gradient(90deg, #22C55E, #15803D)',
+                                    producto['categoria'] == 'Herramienta',
+                                    'linear-gradient(90deg, #34D399, #10B981)',
                                     rx.cond(
-                                        producto['categoria'] == 'quimico',
-                                        'linear-gradient(90deg, #EAB308, #A16207)',
-                                        'linear-gradient(90deg, #667eea, #764ba2)'
+                                        producto['categoria'] == 'Químico',
+                                        'linear-gradient(90deg, #FBBF24, #F59E0B)',
+                                        rx.cond(
+                                            producto['categoria'] == 'Electrónico',
+                                            'linear-gradient(90deg, #A78BFA, #8B5CF6)',
+                                            'linear-gradient(90deg, #94A3B8, #64748B)'
+                                        ),
                                     ),
+                                    
                                 ),
                             ),
                         ),
@@ -255,12 +264,7 @@ def inventario() -> rx.Component:
             width="100%",
             align="center",
         ),
-        # Indicador temporal para depuración: muestra si el modal está abierto
-        rx.cond(
-            InventarioState.show_add_modal,
-            rx.text("MODAL ABIERTO", color="green", font_weight="bold"),
-            rx.text("MODAL CERRADO", color="gray"),
-        ),
+        
         # Overlay para agregar producto (compatible, centrado y proporcional)
         rx.cond(
             InventarioState.show_add_modal,
