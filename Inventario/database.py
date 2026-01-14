@@ -122,6 +122,16 @@ class Database:
         
         return dict(row) if row else None
     
+    def producto_por_categoria(self,categoria: str)-> List[Dict[str,Any]]:
+        """Devuelve la cantidad de productos por categoría"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT * categoria, COUNT (*) AS total_productos, SUM(cantidad) AS cantidad_total FROM productos GROUP BY categoria ORDER BY categoria ASC", (categoria))
+        resultado = [Dict(row) for row in cursor.fetchall()]
+        conn.close()
+        return resultado
+    
     def actualizar_producto(self, producto_id: int, **kwargs) -> bool:
         """Actualiza un producto"""
         conn = self.get_connection()

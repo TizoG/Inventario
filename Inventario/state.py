@@ -46,6 +46,9 @@ class InventarioState(rx.State):
     filter_categoria: str = ""
     filter_estado: str = ""
     productos_display: List[Dict[str, Any]] = []
+
+    # Categorias
+    categorias: list[dict]= []
     
     # Métodos para cargar datos
     def cargar_productos(self):
@@ -307,3 +310,7 @@ class InventarioState(rx.State):
         self.form_cantidad = "0"
         self.form_precio = "0"
         self.form_categoria = ""
+
+
+    def cargar_categorias(self):
+        self.categorias = db.producto_por_categoria()
